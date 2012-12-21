@@ -30,7 +30,7 @@ node.set['rabbitmq']['default_user'] = user
 node.set['rabbitmq']['default_pass'] = pass
 node.set['rabbitmq']['erlang_cookie'] = cookie
 node.set['rabbitmq']['cluster_disk_nodes'] = search(:node, "roles:#{rabbit_server_role}").map do |n|
-  "rabbit@#{n['hostname']}"
+  "#{user}@#{n['hostname']}"
 end
 
 include_recipe "rabbitmq"
