@@ -13,7 +13,7 @@ Requirements
 Attributes
 ==========
 
-* `node['infra-messaging']['user']` - The user to create/connect to rabbit as.
+* `node['infra-messaging']['vhost']` - The rabbit virtualhost.
 
 Usage
 =====
