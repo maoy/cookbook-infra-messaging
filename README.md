@@ -13,8 +13,6 @@ Requirements
 Attributes
 ==========
 
-* `node['infra-messaging']['vhost']` - The rabbit virtualhost.
-
 Usage
 =====
 

@@ -22,10 +22,10 @@ class ::Chef::Recipe
 end
 
 rabbit_server_role = node["nova"]["rabbit_server_chef_role"]
-user = node["nova"]["messaging"]["username"]
+user = node["nova"]["rabbit"]["username"]
 pass = user_password user
 cookie = service_password "rabbit_cookie"
-vhost = node["infra-messaging"]["vhost"]
+vhost = node["nova"]["rabbit"]["vhost"]
 
 node.set["rabbitmq"]["default_user"] = user
 node.set["rabbitmq"]["default_pass"] = pass
@@ -35,6 +35,10 @@ node.set["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_serve
 end
 
 include_recipe "rabbitmq"
+
+rabbitmq_user "guest" do
+  action :delete
+end
 
 rabbitmq_vhost vhost do
   action :add

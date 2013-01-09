@@ -18,5 +18,3 @@
 #
 
 include_attribute "nova"
-
-default["infra-messaging"]["vhost"] = "/nova"
