@@ -22,14 +22,14 @@ class ::Chef::Recipe
 end
 
 rabbit_server_role = node["nova"]["rabbit_server_chef_role"]
-user = node['infra-messaging']['user']
+user = node["nova"]["messaging"]["username"]
 pass = user_password user
 cookie = service_password "rabbit_cookie"
 
-node.set['rabbitmq']['default_user'] = user
-node.set['rabbitmq']['default_pass'] = pass
-node.set['rabbitmq']['erlang_cookie'] = cookie
-node.set['rabbitmq']['cluster_disk_nodes'] = search(:node, "roles:#{rabbit_server_role}").map do |n|
+node.set["rabbitmq"]["default_user"] = user
+node.set["rabbitmq"]["default_pass"] = pass
+node.set["rabbitmq"]["erlang_cookie"] = cookie
+node.set["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_server_role}").map do |n|
   "#{user}@#{n['hostname']}"
 end
 

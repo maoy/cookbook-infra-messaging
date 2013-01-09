@@ -17,4 +17,4 @@
 # limitations under the License.
 #
 
-default['infra-messaging']['user'] = "rabbit"
+include_attribute "nova"
