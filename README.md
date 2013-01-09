@@ -6,6 +6,7 @@ Installs/Configures infra-messaging
 Requirements
 ============
 
+* nova
 * openstack-common
 * rabbitmq
 
