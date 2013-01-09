@@ -12,4 +12,4 @@ recipe           "infra-messaging", "Installs/Configures infra-messaging"
 end
 
 depends "rabbitmq"
-depends "openstack-common", ">= 0.1.4"
+depends "openstack-common", ">= 0.1.5"
