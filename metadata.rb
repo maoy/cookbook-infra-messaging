@@ -12,5 +12,5 @@ recipe           "infra-messaging", "Installs/Configures infra-messaging"
 end
 
 depends "nova"
-depends "openstack-common", ">= 0.1.5"
+depends "openstack-common", ">= 0.1.7"
 depends "rabbitmq"
