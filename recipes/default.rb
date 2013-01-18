@@ -17,9 +17,21 @@
 # limitations under the License.
 #
 
+include_recipe "rabbitmq"
+
+# Restart rabbit with default settings, before moving on.
+service "rabbitmq-server" do
+  supports :restart => true
+
+  action :restart
+
+  not_if { ::File.exists? "/var/lib/rabbitmq/.reset_mnesia_database" }
+end
+
 class ::Chef::Recipe
   include ::Openstack
 end
+
 rabbit_server_role = node["nova"]["rabbit_server_chef_role"]
 user = node["nova"]["rabbit"]["username"]
 pass = user_password user
