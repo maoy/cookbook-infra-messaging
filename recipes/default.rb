@@ -17,6 +17,17 @@
 # limitations under the License.
 #
 
+include_recipe "rabbitmq"
+
+# Restart rabbit with default settings, before moving on.
+service "rabbitmq-server" do
+  supports :restart => true
+
+  action :restart
+
+  not_if { ::File.exists? "/var/lib/rabbitmq/.reset_mnesia_database" }
+end
+
 class ::Chef::Recipe
   include ::Openstack
 end
@@ -30,6 +41,7 @@ vhost = node["nova"]["rabbit"]["vhost"]
 node.set["rabbitmq"]["default_user"] = user
 node.set["rabbitmq"]["default_pass"] = pass
 node.set["rabbitmq"]["erlang_cookie"] = cookie
+node.set["rabbitmq"]["cluster"] = true
 node.set["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_server_role}").map do |n|
   "#{user}@#{n['hostname']}"
 end
@@ -55,4 +67,28 @@ rabbitmq_user user do
   permissions '".*" ".*" ".*"'
 
   action :set_permissions
+end
+
+# Necessary for graphing.  The guest user
+# by default is admin, since we delete
+# this user, I don't see too much harm in
+# making the rabbit user an administrator.
+rabbitmq_user user do
+  user_tag "administrator"
+
+  action :set_user_tags
+end
+
+# Remove the mnesia database. This is necessary so the nodes
+# in the cluster will be able to recognize one another.
+execute "Reset mnesia" do
+  cwd "/var/lib/rabbitmq"
+  command <<-EOH
+    service rabbitmq-server stop;
+    rm -rf mnesia/;
+    touch .reset_mnesia_database;
+    service rabbitmq-server start
+  EOH
+
+  not_if { ::File.exists? "/var/lib/rabbitmq/.reset_mnesia_database" }
 end
