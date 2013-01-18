@@ -20,7 +20,6 @@
 class ::Chef::Recipe
   include ::Openstack
 end
-
 rabbit_server_role = node["nova"]["rabbit_server_chef_role"]
 user = node["nova"]["rabbit"]["username"]
 pass = user_password user
@@ -30,6 +29,7 @@ vhost = node["nova"]["rabbit"]["vhost"]
 node.set["rabbitmq"]["default_user"] = user
 node.set["rabbitmq"]["default_pass"] = pass
 node.set["rabbitmq"]["erlang_cookie"] = cookie
+node.set["rabbitmq"]["cluster"] = true
 node.set["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_server_role}").map do |n|
   "#{user}@#{n['hostname']}"
 end
@@ -55,4 +55,18 @@ rabbitmq_user user do
   permissions '".*" ".*" ".*"'
 
   action :set_permissions
+end
+
+# Remove the mnesia database. This is necessary so the nodes
+# in the cluster will be able to recognize one another.
+execute "Reset mnesia" do
+  cwd "/var/lib/rabbitmq"
+  command <<-EOH
+    service rabbitmq-server stop;
+    rm -rf mnesia/;
+    touch .reset_mnesia_database;
+    service rabbitmq-server start
+  EOH
+
+  not_if { ::File.exists? "/var/lib/rabbitmq/.reset_mnesia_database" }
 end
