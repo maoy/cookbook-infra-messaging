@@ -57,6 +57,16 @@ rabbitmq_user user do
   action :set_permissions
 end
 
+# Necessary for graphing.  The guest user
+# by default is admin, since we delete
+# this user, I don't see too much harm in
+# making the rabbit user an administrator.
+rabbitmq_user user do
+  user_tag "administrator"
+
+  action :set_user_tags
+end
+
 # Remove the mnesia database. This is necessary so the nodes
 # in the cluster will be able to recognize one another.
 execute "Reset mnesia" do
