@@ -18,6 +18,7 @@
 #
 
 include_recipe "rabbitmq"
+include_recipe "rabbitmq::mgmt_console"
 
 # Restart rabbit with default settings, before moving on.
 service "rabbitmq-server" do
