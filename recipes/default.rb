@@ -21,11 +21,10 @@ include_recipe "rabbitmq"
 include_recipe "rabbitmq::mgmt_console"
 
 # Restart rabbit with default settings, before moving on.
-service "rabbitmq-server" do
-  supports :restart => true
-
-  action :restart
-
+# Using execute to make the change immediate vs delaying.
+# I could have continued to use service, but the callbacks
+# get annoying.
+execute "service rabbitmq-server restart" do
   not_if { ::File.exists? "/var/lib/rabbitmq/.reset_mnesia_database" }
 end
 
@@ -39,15 +38,13 @@ pass = user_password user
 cookie = service_password "rabbit_cookie"
 vhost = node["nova"]["rabbit"]["vhost"]
 
-node.set["rabbitmq"]["default_user"] = user
-node.set["rabbitmq"]["default_pass"] = pass
-node.set["rabbitmq"]["erlang_cookie"] = cookie
-node.set["rabbitmq"]["cluster"] = true
-node.set["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_server_role}").map do |n|
+node.override["rabbitmq"]["default_user"] = user
+node.override["rabbitmq"]["default_pass"] = pass
+node.override["rabbitmq"]["erlang_cookie"] = cookie
+node.override["rabbitmq"]["cluster"] = true
+node.override["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_server_role}").map do |n|
   "#{user}@#{n['hostname']}"
 end
-
-include_recipe "rabbitmq"
 
 rabbitmq_user "guest" do
   action :delete
@@ -79,6 +76,10 @@ rabbitmq_user user do
 
   action :set_user_tags
 end
+
+# Re-configure rabbit to use clustering, by using the
+# the node.override attributes from above.
+include_recipe "rabbitmq"
 
 # Remove the mnesia database. This is necessary so the nodes
 # in the cluster will be able to recognize one another.
