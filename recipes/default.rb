@@ -38,11 +38,11 @@ pass = user_password user
 cookie = service_password "rabbit_cookie"
 vhost = node["nova"]["rabbit"]["vhost"]
 
-node.set["rabbitmq"]["default_user"] = user
-node.set["rabbitmq"]["default_pass"] = pass
-node.set["rabbitmq"]["erlang_cookie"] = cookie
-node.set["rabbitmq"]["cluster"] = true
-node.set["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_server_role}").map do |n|
+node.override["rabbitmq"]["default_user"] = user
+node.override["rabbitmq"]["default_pass"] = pass
+node.override["rabbitmq"]["erlang_cookie"] = cookie
+node.override["rabbitmq"]["cluster"] = true
+node.override["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_server_role}").map do |n|
   "#{user}@#{n['hostname']}"
 end
 
@@ -78,7 +78,7 @@ rabbitmq_user user do
 end
 
 # Re-configure rabbit to use clustering, by using the
-# the node.set attributes from above.
+# the node.override attributes from above.
 include_recipe "rabbitmq"
 
 # Remove the mnesia database. This is necessary so the nodes
