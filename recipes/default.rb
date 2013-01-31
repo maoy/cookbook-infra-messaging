@@ -21,11 +21,10 @@ include_recipe "rabbitmq"
 include_recipe "rabbitmq::mgmt_console"
 
 # Restart rabbit with default settings, before moving on.
-service "rabbitmq-server" do
-  supports :restart => true
-
-  action :restart
-
+# Using execute to make the change immediate vs delaying.
+# I could have continued to use service, but the callbacks
+# get annoying.
+execute "service rabbitmq-server restart" do
   not_if { ::File.exists? "/var/lib/rabbitmq/.reset_mnesia_database" }
 end
 
@@ -46,8 +45,6 @@ node.set["rabbitmq"]["cluster"] = true
 node.set["rabbitmq"]["cluster_disk_nodes"] = search(:node, "roles:#{rabbit_server_role}").map do |n|
   "#{user}@#{n['hostname']}"
 end
-
-include_recipe "rabbitmq"
 
 rabbitmq_user "guest" do
   action :delete
@@ -79,6 +76,10 @@ rabbitmq_user user do
 
   action :set_user_tags
 end
+
+# Re-configure rabbit to use clustering, by using the
+# the node.set attributes from above.
+include_recipe "rabbitmq"
 
 # Remove the mnesia database. This is necessary so the nodes
 # in the cluster will be able to recognize one another.
