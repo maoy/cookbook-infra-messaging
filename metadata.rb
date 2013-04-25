@@ -1,6 +1,6 @@
 name             "infra-messaging"
-maintainer       "John Dewey"
-maintainer_email "john@dewey.ws"
+maintainer       "AT&T Services, Inc."
+maintainer_email "cookbooks@lists.tfoundry.com"
 license          "Apache 2.0"
 description      "Installs/Configures infra-messaging"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
